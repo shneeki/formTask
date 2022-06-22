@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-
 import { useForm, Controller } from 'react-hook-form';
+
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -19,43 +21,60 @@ function getAge(dateString: string) {
   return age;
 }
 
+const signupSchema = yup.object().shape({
+  userName: yup.string().required('You must enter your user name'),
+  birthday: yup.string().required('You must select your birthday'),
+  age: yup
+    .number()
+    .test('DOB', 'Incorrect date selected, must be older than 18', (value) => {
+      if (value === undefined || value >= 18) return true;
+      return false;
+    }),
+  isTermsAgreed: yup
+    .boolean()
+    .oneOf([true], 'You must accept the terms and  conditions'),
+});
+
 interface ISignUp {
   userName: string;
   birthday: Date;
-  age: number;
   isTermsAgreed: boolean;
+  age: number;
 }
-const defaultValues: ISignUp = {
+const defaultValues: Omit<ISignUp, 'age' | 'birthday'> = {
   userName: '',
-  birthday: new Date(),
-  age: 0,
   isTermsAgreed: false,
 };
 
 function App() {
-  // const [value, setValue] = React.useState<Date | null>(null);
-  const { handleSubmit, getValues, setValue, watch, control } =
-    useForm<ISignUp>({
-      defaultValues,
-    });
-  const onSubmit = (data: any) => console.log(data);
-  console.log(watch('userName'));
-  console.log('birthday' + watch('birthday'));
-  console.log('isTermsAgreed' + watch('isTermsAgreed'));
+  const {
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    control,
+    reset,
+  } = useForm<ISignUp>({
+    defaultValues,
+    resolver: yupResolver(signupSchema),
+  });
+  const onSubmit = (data: any) => {
+    alert(JSON.stringify(data));
+    reset();
+  };
+
   return (
     <Box
       display="flex"
       justifyContent="center"
       alignItems="center"
       minHeight="100vh">
-      <form className="signupForm">
+      <form className="signupForm" name="submitForm">
         <Controller
           name="userName"
           control={control}
           render={({ field }) => (
             <div className="formInput">
               <TextField
-                required
                 fullWidth
                 label="Username"
                 value={field.value}
@@ -63,9 +82,13 @@ function App() {
                   field.onChange(newValue);
                 }}
               />
+              {errors.userName && (
+                <p className="formError">{errors.userName.message}</p>
+              )}
             </div>
           )}
         />
+
         <Controller
           name="birthday"
           control={control}
@@ -77,12 +100,19 @@ function App() {
                   value={field.value}
                   onChange={(newValue) => {
                     field.onChange(newValue);
+                    if (newValue)
+                      setValue('age', getAge(newValue.toString()), {
+                        shouldValidate: true,
+                      });
                   }}
                   renderInput={(params: any) => (
                     <TextField {...params} fullWidth />
                   )}
                 />
               </LocalizationProvider>
+              {errors.birthday && (
+                <p className="formError">{errors.birthday.message}</p>
+              )}
             </div>
           )}
         />
@@ -96,38 +126,44 @@ function App() {
               style={{ pointerEvents: 'none', userSelect: 'none' }}>
               <TextField
                 fullWidth
-                id="outlined"
+                InputLabelProps={{ shrink: true }}
                 label="Age"
-                value={getAge(getValues().birthday.toString())}
+                id="outlined"
+                value={field.value}
                 InputProps={{
                   readOnly: true,
                 }}
               />
+              {errors.age && <p className="formError">{errors.age.message}</p>}
             </div>
           )}
         />
-
         <Controller
           name="isTermsAgreed"
           control={control}
           render={({ field }) => (
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={field.value}
-                  size="medium"
-                  onChange={(newValue) => {
-                    field.onChange(newValue);
-                  }}
-                />
-              }
-              label="I have read and agree to User Agreement and Privacy Policy."
-            />
+            <>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={field.value}
+                    size="medium"
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                  />
+                }
+                label="I have read and agree to User Agreement and Privacy Policy."
+              />
+              {errors.isTermsAgreed && (
+                <p className="formError">{errors.isTermsAgreed.message}</p>
+              )}
+            </>
           )}
         />
-        {/* <input type="submit" /> */}
-        <Button variant="contained" onClick={handleSubmit(onSubmit)}>
-          Register
+
+        <Button onClick={handleSubmit(onSubmit)} variant={'contained'}>
+          Submit
         </Button>
       </form>
     </Box>

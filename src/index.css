@@ -12,3 +12,10 @@
   justify-content: 'center';
   align-items: 'center';
 }
+.formError {
+  color: #bf1650;
+}
+.formError::before {
+  display: inline;
+  content: '⚠ ';
+}
