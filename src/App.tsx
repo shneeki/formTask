@@ -14,6 +14,8 @@ import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
+import { useSnackbar } from 'notistack';
+
 function getAge(dateString: string) {
   const today = new Date();
   const birthDate = new Date(dateString);
@@ -50,18 +52,21 @@ function App() {
   const {
     handleSubmit,
     setValue,
+    getValues,
     formState: { errors },
     control,
     reset,
   } = useForm<ISignUp>({
     defaultValues,
+
     resolver: yupResolver(signupSchema),
   });
-  const onSubmit = (data: any) => {
-    alert(JSON.stringify(data));
-    reset();
-  };
 
+  const { enqueueSnackbar } = useSnackbar();
+
+  const onSubmit = (data: any) => {
+    enqueueSnackbar(JSON.stringify(getValues()));
+  };
   return (
     <Box
       display="flex"
