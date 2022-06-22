@@ -24,9 +24,7 @@ function App() {
         <div className="formInput">
           <TextField
             required
-            sx={{
-              width: '100%',
-            }}
+            fullWidth
             id="outlined-required"
             label="Username"
             defaultValue=""
@@ -47,15 +45,14 @@ function App() {
 
         <div className="formInput">
           <TextField
-            sx={{
-              width: '100%',
-            }}
+            fullWidth
+            disabled
             id="outlined"
             label="Age"
             defaultValue=""
-            InputProps={{
-              readOnly: true,
-            }}
+            // InputProps={{
+            //   readOnly: true,
+            // }}
           />
         </div>
         <FormControlLabel
