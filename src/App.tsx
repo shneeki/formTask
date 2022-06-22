@@ -12,6 +12,13 @@ import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
+function getAge(dateString: string) {
+  const today = new Date();
+  const birthDate = new Date(dateString);
+  const age = today.getFullYear() - birthDate.getFullYear();
+  return age;
+}
+
 interface ISignUp {
   userName: string;
   birthday: Date;
@@ -84,16 +91,17 @@ function App() {
           name="age"
           control={control}
           render={({ field }) => (
-            <div className="formInput">
+            <div
+              className="formInput"
+              style={{ pointerEvents: 'none', userSelect: 'none' }}>
               <TextField
                 fullWidth
-                disabled
                 id="outlined"
                 label="Age"
-                // value={getValues().birthday?.}
-                // InputProps={{
-                //   readOnly: true,
-                // }}
+                value={getAge(getValues().birthday.toString())}
+                InputProps={{
+                  readOnly: true,
+                }}
               />
             </div>
           )}
