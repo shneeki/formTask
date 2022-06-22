@@ -2,3 +2,13 @@
 @import '@fontsource/roboto/400.css';
 @import '@fontsource/roboto/500.css';
 @import '@fontsource/roboto/700.css';
+
+.formInput {
+  margin-bottom: 20px;
+}
+.signupForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: 'center';
+  align-items: 'center';
+}
