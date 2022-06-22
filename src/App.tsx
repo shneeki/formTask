@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
 import * as yup from 'yup';
@@ -53,9 +53,8 @@ function App() {
     handleSubmit,
     setValue,
     getValues,
-    formState: { errors },
+    formState: { errors, submitCount, isSubmitted, isValid },
     control,
-    reset,
   } = useForm<ISignUp>({
     defaultValues,
 
@@ -65,8 +64,18 @@ function App() {
   const { enqueueSnackbar } = useSnackbar();
 
   const onSubmit = (data: any) => {
-    enqueueSnackbar(JSON.stringify(getValues()));
+    console.log(JSON.stringify(data));
   };
+
+  useEffect(() => {
+    if (isSubmitted && !isValid) {
+      enqueueSnackbar(JSON.stringify(errors), { variant: 'error' });
+    }
+    if (isSubmitted && isValid) {
+      enqueueSnackbar(JSON.stringify(getValues()), { variant: 'success' });
+    }
+  }, [submitCount]);
+
   return (
     <Box
       display="flex"
@@ -107,7 +116,7 @@ function App() {
                     field.onChange(newValue);
                     if (newValue)
                       setValue('age', getAge(newValue.toString()), {
-                        shouldValidate: true,
+                        shouldValidate: false,
                       });
                   }}
                   renderInput={(params: any) => (
